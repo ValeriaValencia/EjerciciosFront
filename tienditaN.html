@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tienda Nueva</title>
+  <link rel="stylesheet" href="tiendita.css" type="text/css" >
+  
+</head>
+<body>
+  <header class="header">
+    <div class="izquierda">
+      <h3>Tienda de Valeria</h3>
+      <span>productos que ofrecemos</span>  
+    </div>
+
+    <div id="loaderContainer" class="loaderContainer">
+      <div class="preloader"></div>
+    </div>
+
+    <div class="centro">
+      <span id="productosSeleccionados" class="productosSeleccionados"> 0 producto(s) comprado(s)</span>
+
+    </div>
+  
+    <div class="derecha">
+      <span>Selecciona las categorias que buscas</span>
+
+      <label class="hombreLabel" for="hombreCheckbox">
+        <input type="checkbox" id="hombreCheckbox" class="hombreClass" checked/>
+        <span class="hombreSpan">Hombre</span>
+      </label>
+
+      <label class="mujerLabel" for="mujerCheckbox">
+        <input type="checkbox" id="mujerCheckbox" class="mujerClass" checked/>
+        <span class="mujerSpan">Mujer</span>
+      </label>
+
+      <label class="joven" for="jovenCheckbox">
+        <input type="checkbox" id="jovenCheckbox" class="joven" checked/>
+        <span class="joven">Joven</span>
+      </label>
+
+      <span id="numeroProductos" class="numeroProductos"> 0 productos</span>
+    </div>
+  </header>
+
+
+  <script>
+    const crearTag = (tag,className,id,textContent) => {
+        const element = document.createElement(tag);
+        element.className = className;
+        element.id = id;
+        element.textContent = textContent;
+        return element
+    }
+
+    let nProductos = document.getElementById('numeroProductos');
+    function cuantosProductos() {
+      nProductos.innerHTML='';
+      let cP = divProductos.childElementCount;
+      console.log('procuctos:' + '' + cP);
+      let dProductos = document.createTextNode(cP + ' ' + 'productos');
+      nProductos.appendChild(dProductos);
+    }
+  
+    // CONTEO DE PRODUCTOS COMPRADOS
+
+    let nComprados = document.getElementById('productosSeleccionados');
+    function cuantosComprados(){
+      nComprados.innerHTML= '';
+      let cC = divComprados.childElementCount;
+      console.log('comprados' + cC);
+      let dComprados = document.createTextNode(cC + ' ' + 'producto(s) comprado(s)');
+      nComprados.appendChild(dComprados);
+    }
+
+    
+
+ /*  const divEspera = crearTag('div','divEspera','divEspera','Cargando Pagina...')
+  document.body.appendChild(divEspera) */
+
+    const divProductos = crearTag('main','divProductos','divProductos','');
+    const modalDiv = crearTag('div','modal','modalDiv','');
+    const botonCerrar = crearTag('button','botonCerrar','botonCerrar','Cerrar');
+    const botonComprar = crearTag('button','botonComprar','botonComprar','Comprar');
+    const divComprados = crearTag('div','divComprados divProductos','divComprados','')
+    const tituloComprados = crearTag('h3','tituloComprados','','Productos Comprados')
+    divComprados.appendChild(tituloComprados)
+    document.body.appendChild(divProductos);
+    document.body.appendChild(modalDiv);
+    document.body.appendChild(divComprados);
+
+
+
+/* let modal = document.getElementById("modalDiv") */
+function miModal(){
+        modalDiv.appendChild(arribaProducto);
+        modalDiv.appendChild(aboutDiv);
+        modalDiv.appendChild(botones);
+        modalDiv.style.display = "block";
+      }
+
+    let arribaProducto = crearTag('div','modal-content','arribaProducto','');
+    let aboutDiv = crearTag('div','modal-content','','');
+    const botones = crearTag('div','modal-content botones','botones','');
+    modalDiv.appendChild(botones);
+    botones.appendChild(botonComprar);
+    botones.appendChild(botonCerrar);
+    
+
+    document.getElementById("botonCerrar").onclick = () => {
+      arribaProducto.innerHTML = '';
+      aboutDiv.innerHTML = ''
+      modalDiv.style.display = "none";
+    }
+
+    /* document.getElementById("botonComprar").onclick = () => {
+      addProduct(product)
+    } */
+
+    window.onclick = (event) => {
+      if (event.target == modalDiv) {
+        arribaProducto.innerHTML = '';
+        aboutDiv.innerHTML = ''
+        modalDiv.style.display = "none";
+      }
+    }
+
+
+    let arrayProductosTotal = [];
+    let productosComprados = [];
+
+    const datosProductos = async () => {
+      const data = await fetch('http://slowwly.robertomurray.co.uk/delay/3000/url/http://demo6292426.mockable.io/products')
+      return data.json()
+    }
+
+    const promesaValor = (promise,callback) => {
+      promise.then(result => {
+        callback(result);
+      });
+    }
+
+    promesaValor(datosProductos(), result => {
+          arrayProductosTotal = result;
+          mostrarProductos(arrayProductosTotal);
+          document.getElementById('loaderContainer').style.display ="none";
+    })
+
+    const filtroMujeres = productos => {
+      return productos.filter(product => product.category === 'mujer');
+    }
+
+    const filtroHombres = productos => {
+      return productos.filter(product => product.category === 'hombre');
+    }
+
+    const filtroJovenes = productos => {
+      return productos.filter(product => product.category === 'joven');
+    }
+
+    const addProduct = product => {
+          productosComprados.push(product);
+          mostrarProductosComprados(productosComprados)
+    }
+
+
+
+
+    /* const muestraProductosModal = products => {
+      products.forEach((product) => {
+        const sobreProducto = document.createElement('div');
+        sobreProducto.className = 'modal-content'
+
+        sobreProducto.innerHTML =  `<span> ${product.about} </span>`;
+        
+      })
+      modalDiv.appendChild(sobreProducto)
+    }
+ */
+
+
+
+
+    const mostrarProductos = products => {
+      document.getElementById('divProductos').innerHTML = '';
+
+      products.forEach((product, index ,about) => {
+        const divMisProductos = document.createElement('div');
+        divMisProductos.className = 'divMisProductos cuadrado'
+        divMisProductos.innerHTML = `<span> ${product.comparativePrice} </span> <p> ${product.price} </p> <h4> ${product.name} ${index+1} </h4> `;
+        
+
+          divMisProductos.addEventListener('click', () => {
+
+                      const infoProducto = document.createElement('p');
+                      infoProducto.innerHTML= `${product.about}`;
+                                         
+                      aboutDiv.appendChild(infoProducto)       
+                      miModal()
+                      document.getElementById("botonComprar").onclick = () => {
+      addProduct(product)
+    }
+          
+        })
+     
+        document.getElementById('divProductos').appendChild(divMisProductos);
+      });
+      cuantosProductos()
+    }
+
+
+    const mostrarProductosComprados = products => {
+      document.getElementById('divComprados').innerHTML = '';
+
+      products.forEach((product, index) => {
+        const divMisProductosComprados = document.createElement('div');
+        divMisProductosComprados.className = 'divMisProductos cuadrado'
+        divMisProductosComprados.innerHTML = `<span> ${product.comparativePrice} </span> <p> ${product.price} </p> <h4> ${product.name} ${index+1} </h4> `;
+        document.getElementById('divComprados').appendChild(divMisProductosComprados);
+      });
+      cuantosComprados();
+    }
+
+    const checkHombres = document.getElementById('hombreCheckbox');
+    const checkMujeres = document.getElementById('mujerCheckbox');
+    const checkJovenes = document.getElementById('jovenCheckbox');
+
+    const filtrarProductosPorSeleccion = (hombre,mujer,jovenes) => {
+      console.log(hombre,mujer,jovenes)
+      let result = [];
+      if(hombre) {
+        result = result.concat(filtroHombres(arrayProductosTotal));
+      }
+
+      if(mujer) {
+        result = result.concat(filtroMujeres(arrayProductosTotal));
+      }
+
+      if(jovenes) {
+        result = result.concat(filtroJovenes(arrayProductosTotal));
+      }
+      return result;
+    }
+
+    const eventoCheck = () => {
+      const resultado =  filtrarProductosPorSeleccion(
+        checkHombres.checked,
+        checkMujeres.checked,
+        checkJovenes.checked
+
+      );
+      console.log(resultado)
+      mostrarProductos(resultado)
+    }
+
+    checkHombres.addEventListener('click', eventoCheck);
+    checkMujeres.addEventListener('click', eventoCheck);
+    checkJovenes.addEventListener('click', eventoCheck);
+
+
+    
+
+  </script>
+</body>
+</html>
